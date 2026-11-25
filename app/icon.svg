@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <rect width="64" height="64" rx="16" fill="#06080F" />
+  <rect x="2" y="2" width="60" height="60" rx="14" stroke="url(#vdStroke)" stroke-opacity="0.45" stroke-width="2" />
+  <path d="M16 18L32 48L48 18H39.5L32 33L24.5 18H16Z" fill="url(#vdGrad)" />
+  <circle cx="32" cy="18" r="3.5" fill="#22D3EE" />
+  <defs>
+    <linearGradient id="vdGrad" x1="16" y1="18" x2="48" y2="48" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#A78BFA" />
+      <stop offset="0.55" stop-color="#6366F1" />
+      <stop offset="1" stop-color="#22D3EE" />
+    </linearGradient>
+    <linearGradient id="vdStroke" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#8B5CF6" />
+      <stop offset="1" stop-color="#22D3EE" />
+    </linearGradient>
+  </defs>
+</svg>
