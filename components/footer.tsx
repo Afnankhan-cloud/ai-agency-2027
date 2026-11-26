@@ -10,6 +10,7 @@ type ModalTopic = "terms" | "privacy" | "contact" | null;
 const ANCHOR_LINKS = [
   { href: "#whats-inside", label: "What’s Inside" },
   { href: "#why-2027", label: "Why 2027" },
+  { href: "#proof", label: "Proof" },
   { href: "#pricing", label: "Pricing" },
   { href: "#faq", label: "FAQ" }
 ] as const;

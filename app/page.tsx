@@ -6,8 +6,9 @@ import { Footer } from "@/components/footer";
 import { Hero } from "@/components/hero";
 import { Opportunity } from "@/components/opportunity";
 import { Pricing } from "@/components/pricing";
+import { ProductProof } from "@/components/product-proof";
 import { SiteHeader } from "@/components/site-header";
-import { Testimonials } from "@/components/testimonials";
+import { MobileStickyWrapper } from "@/components/mobile-sticky-wrapper";
 import { WhatsInside } from "@/components/whats-inside";
 import type { MarketType } from "@/lib/analytics";
 import { BRAND } from "@/lib/constants";
@@ -49,7 +50,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       {
         "@type": "Offer",
         name: "India Launch Access",
-        price: offerState.india.activePrice,
+        price: 999,
         priceCurrency: "INR",
         availability: "https://schema.org/InStock",
         url: `${siteUrl}/#pricing`
@@ -57,7 +58,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       {
         "@type": "Offer",
         name: "International Launch Access",
-        price: offerState.international.activePrice,
+        price: 49,
         priceCurrency: "USD",
         availability: "https://schema.org/InStock",
         url: `${siteUrl}/#pricing`
@@ -86,12 +87,13 @@ export default async function HomePage({ searchParams }: HomePageProps) {
 
       <SiteHeader />
 
-      <main>
+      <main className="pb-24 md:pb-0">
         <Hero />
         <WhatsInside />
         <Opportunity />
         <Audience />
-        <Testimonials />
+        {/* Genuine Product Proof (n8n workflow preview + authentic 12-chapter manual) */}
+        <ProductProof />
         <Pricing
           offerState={offerState}
           initialPendingMarket={initialPendingMarket}
@@ -99,6 +101,9 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         <Faq />
         <FinalCta offerState={offerState} />
       </main>
+
+      {/* Persistent Mobile Sticky Purchase Bar */}
+      <MobileStickyWrapper />
 
       <Footer contactEmail={publicEnv.NEXT_PUBLIC_CONTACT_EMAIL} />
     </div>

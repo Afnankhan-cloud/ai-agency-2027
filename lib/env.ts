@@ -22,7 +22,8 @@ const publicEnvSchema = z.object({
     z.string().email().default("support@vertexdigitals.example")
   ),
   NEXT_PUBLIC_SUPABASE_URL: optionalUrl,
-  NEXT_PUBLIC_SUPABASE_ANON_KEY: optionalString
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: optionalString,
+  NEXT_PUBLIC_RAZORPAY_KEY_ID: optionalString
 });
 
 const serverEnvSchema = z.object({
@@ -39,12 +40,14 @@ const serverEnvSchema = z.object({
       .refine((val) => !Number.isNaN(Date.parse(val)), {
         message: "LAUNCH_END_AT must be a valid ISO-8601 date string"
       })
-      .optional()
+      .default("2026-12-20T23:59:59+05:30")
   ),
   USD_TO_INR_RATE: z.preprocess(
     emptyToUndefined,
     z.coerce.number().positive().max(1000).default(85)
   ),
+  RAZORPAY_KEY_ID: optionalString,
+  RAZORPAY_KEY_SECRET: optionalString,
   RAZORPAY_LAUNCH_CHECKOUT_URL: optionalUrl,
   RAZORPAY_STANDARD_CHECKOUT_URL: optionalUrl,
   RAZORPAY_WEBHOOK_SECRET: optionalString,
@@ -52,6 +55,7 @@ const serverEnvSchema = z.object({
   GUMROAD_STANDARD_CHECKOUT_URL: optionalUrl,
   GUMROAD_WEBHOOK_SECRET: optionalString,
   GUMROAD_SELLER_ID: optionalString,
+  DOWNLOAD_SIGNING_SECRET: optionalString,
   ALLOW_TEST_WEBHOOKS: z.preprocess(
     emptyToUndefined,
     z.enum(["true", "false"]).default("false")
@@ -70,7 +74,8 @@ export function getPublicEnv(): PublicEnv {
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
     NEXT_PUBLIC_CONTACT_EMAIL: process.env.NEXT_PUBLIC_CONTACT_EMAIL,
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
-    NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    NEXT_PUBLIC_RAZORPAY_KEY_ID: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID
   });
 
   if (!parsed.success) {
@@ -79,7 +84,8 @@ export function getPublicEnv(): PublicEnv {
       NEXT_PUBLIC_SITE_URL: "http://localhost:3000",
       NEXT_PUBLIC_CONTACT_EMAIL: "support@vertexdigitals.example",
       NEXT_PUBLIC_SUPABASE_URL: undefined,
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: undefined
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: undefined,
+      NEXT_PUBLIC_RAZORPAY_KEY_ID: undefined
     };
   }
 
@@ -98,6 +104,8 @@ export function getServerEnv(): ServerEnv {
     LAUNCH_BUYER_LIMIT: process.env.LAUNCH_BUYER_LIMIT,
     LAUNCH_END_AT: process.env.LAUNCH_END_AT,
     USD_TO_INR_RATE: process.env.USD_TO_INR_RATE,
+    RAZORPAY_KEY_ID: process.env.RAZORPAY_KEY_ID,
+    RAZORPAY_KEY_SECRET: process.env.RAZORPAY_KEY_SECRET,
     RAZORPAY_LAUNCH_CHECKOUT_URL: process.env.RAZORPAY_LAUNCH_CHECKOUT_URL,
     RAZORPAY_STANDARD_CHECKOUT_URL: process.env.RAZORPAY_STANDARD_CHECKOUT_URL,
     RAZORPAY_WEBHOOK_SECRET: process.env.RAZORPAY_WEBHOOK_SECRET,
@@ -105,6 +113,7 @@ export function getServerEnv(): ServerEnv {
     GUMROAD_STANDARD_CHECKOUT_URL: process.env.GUMROAD_STANDARD_CHECKOUT_URL,
     GUMROAD_WEBHOOK_SECRET: process.env.GUMROAD_WEBHOOK_SECRET,
     GUMROAD_SELLER_ID: process.env.GUMROAD_SELLER_ID,
+    DOWNLOAD_SIGNING_SECRET: process.env.DOWNLOAD_SIGNING_SECRET,
     ALLOW_TEST_WEBHOOKS: process.env.ALLOW_TEST_WEBHOOKS
   });
 
@@ -114,8 +123,10 @@ export function getServerEnv(): ServerEnv {
       SUPABASE_SERVICE_ROLE_KEY: undefined,
       ADMIN_EMAIL: undefined,
       LAUNCH_BUYER_LIMIT: 50,
-      LAUNCH_END_AT: undefined,
+      LAUNCH_END_AT: "2026-12-20T23:59:59+05:30",
       USD_TO_INR_RATE: 85,
+      RAZORPAY_KEY_ID: undefined,
+      RAZORPAY_KEY_SECRET: undefined,
       RAZORPAY_LAUNCH_CHECKOUT_URL: undefined,
       RAZORPAY_STANDARD_CHECKOUT_URL: undefined,
       RAZORPAY_WEBHOOK_SECRET: undefined,
@@ -123,6 +134,7 @@ export function getServerEnv(): ServerEnv {
       GUMROAD_STANDARD_CHECKOUT_URL: undefined,
       GUMROAD_WEBHOOK_SECRET: undefined,
       GUMROAD_SELLER_ID: undefined,
+      DOWNLOAD_SIGNING_SECRET: undefined,
       ALLOW_TEST_WEBHOOKS: "false"
     };
   }

@@ -10,10 +10,9 @@ import {
   IndianRupee,
   Loader2,
   ShieldCheck,
-  Sparkles,
   X
 } from "lucide-react";
-import { LaunchCountdown } from "@/components/launch-countdown";
+import { CheckoutModal } from "@/components/checkout-modal";
 import { trackCheckoutStart, type MarketType } from "@/lib/analytics";
 import type { LiveOfferState } from "@/lib/pricing";
 
@@ -23,32 +22,38 @@ interface PricingProps {
 }
 
 const INCLUDED_FEATURES = [
-  "Complete AI Agency 2027 Ebook (PDF)",
+  "Complete AI Agency Mastery Ebook (PDF)",
   "Practical Offer, Outreach & Discovery Workbooks",
   "10 Ready-to-Use n8n Automation Workflows (.json)",
   "Step-by-Step First Client Acquisition Guide",
-  "Instant Digital ZIP Delivery"
+  "Instant Digital ZIP Delivery (4.6 MB)"
 ] as const;
 
-export function Pricing({ offerState, initialPendingMarket }: PricingProps) {
+export function Pricing({ initialPendingMarket }: PricingProps) {
   const [loadingMarket, setLoadingMarket] = useState<MarketType | null>(null);
   const [pendingNoticeMarket, setPendingNoticeMarket] = useState<MarketType | null>(
     initialPendingMarket ?? null
   );
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
+  const [isRazorpayModalOpen, setIsRazorpayModalOpen] = useState(false);
 
-  const handleCheckout = async (market: MarketType) => {
+  const handleIndiaCheckout = () => {
+    trackCheckoutStart("india", "pricing_india");
+    setIsRazorpayModalOpen(true);
+  };
+
+  const handleInternationalCheckout = async () => {
     setCheckoutError(null);
     setPendingNoticeMarket(null);
-    setLoadingMarket(market);
+    setLoadingMarket("international");
 
-    trackCheckoutStart(market, `pricing_${market}`);
+    trackCheckoutStart("international", "pricing_international");
 
     try {
       const response = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ market })
+        body: JSON.stringify({ market: "international" })
       });
 
       const data = (await response.json()) as {
@@ -68,7 +73,7 @@ export function Pricing({ offerState, initialPendingMarket }: PricingProps) {
         return;
       }
 
-      setPendingNoticeMarket(market);
+      setPendingNoticeMarket("international");
       setLoadingMarket(null);
     } catch {
       setCheckoutError("Network error while preparing checkout. Please try again.");
@@ -90,32 +95,13 @@ export function Pricing({ offerState, initialPendingMarket }: PricingProps) {
             Pricing &amp; Instant Access
           </span>
           <h2 className="mt-3 text-3xl font-bold tracking-tight text-white sm:text-4xl">
-            One-Time Payment. Complete Starter Bundle.
+            One-Time Investment. Complete Starter Kit.
           </h2>
-          <p className="mt-4 text-base text-slate-300">
-            Founding launch pricing is limited to the first{" "}
-            {offerState.launchBuyerLimit} buyers.
+          <p className="mt-3 text-base text-slate-300">
+            Instant digital access to the complete ebook, practical templates, and 10 ready-to-use n8n workflows.
           </p>
-
-          <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
-            {offerState.isLaunchActive ? (
-              <span className="inline-flex items-center gap-2 rounded-full border border-violet-400/30 bg-violet-500/10 px-3.5 py-1.5 font-mono text-xs text-violet-200">
-                <Sparkles className="h-3.5 w-3.5 text-violet-300" aria-hidden="true" />
-                {offerState.isDatabaseConnected
-                  ? `${offerState.spotsRemaining} of ${offerState.launchBuyerLimit} founding spots remaining`
-                  : `Founding Tier Active (First ${offerState.launchBuyerLimit} Buyers)`}
-              </span>
-            ) : (
-              <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.05] px-3.5 py-1.5 font-mono text-xs text-slate-300">
-                Standard pricing active
-              </span>
-            )}
-
-            <LaunchCountdown launchEndAt={offerState.launchEndAt} />
-          </div>
         </motion.div>
 
-        {/* Clean notice if checkout URLs are still placeholders */}
         {pendingNoticeMarket ? (
           <div
             role="status"
@@ -125,28 +111,17 @@ export function Pricing({ offerState, initialPendingMarket }: PricingProps) {
               <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-amber-300" aria-hidden="true" />
               <div>
                 <p className="font-semibold text-white">
-                  {pendingNoticeMarket === "india" ? "Razorpay" : "Gumroad"} checkout link
-                  is not configured yet.
+                  Gumroad international checkout link is not configured yet.
                 </p>
                 <p className="mt-1 text-xs leading-relaxed text-amber-200/90">
-                  Set{" "}
-                  <code className="rounded bg-black/40 px-1.5 py-0.5 font-mono">
-                    {pendingNoticeMarket === "india"
-                      ? offerState.isLaunchActive
-                        ? "RAZORPAY_LAUNCH_CHECKOUT_URL"
-                        : "RAZORPAY_STANDARD_CHECKOUT_URL"
-                      : offerState.isLaunchActive
-                        ? "GUMROAD_LAUNCH_CHECKOUT_URL"
-                        : "GUMROAD_STANDARD_CHECKOUT_URL"}
-                  </code>{" "}
-                  in your server environment variables to activate live checkout redirects.
+                  Set <code className="rounded bg-black/40 px-1.5 py-0.5 font-mono">GUMROAD_LAUNCH_CHECKOUT_URL</code> in your environment variables to activate international USD checkout redirects.
                 </p>
               </div>
             </div>
             <button
               type="button"
               onClick={() => setPendingNoticeMarket(null)}
-              aria-label="Dismiss checkout configuration notice"
+              aria-label="Dismiss notice"
               className="rounded-lg p-1 text-amber-200 hover:bg-white/10 hover:text-white"
             >
               <X className="h-4 w-4" aria-hidden="true" />
@@ -189,33 +164,22 @@ export function Pricing({ offerState, initialPendingMarket }: PricingProps) {
               </div>
 
               <h3 className="mt-5 text-2xl font-bold text-white">
-                {offerState.india.title}
+                India Launch Access
               </h3>
-              <p className="mt-1 text-sm text-slate-300">{offerState.india.subtitle}</p>
+              <p className="mt-1 text-sm text-slate-300">For buyers in India (UPI, Cards &amp; NetBanking)</p>
 
+              {/* Price Display */}
               <div className="mt-6 flex flex-wrap items-baseline gap-3">
                 <span className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
-                  {offerState.india.activeFormatted}
+                  ₹999
                 </span>
-                {offerState.isLaunchActive ? (
-                  <>
-                    <span className="text-lg text-slate-400 line-through">
-                      {offerState.india.regularFormatted}
-                    </span>
-                    <span className="rounded-full border border-emerald-400/30 bg-emerald-500/10 px-2.5 py-0.5 font-mono text-[11px] text-emerald-300">
-                      Launch price • First {offerState.launchBuyerLimit} buyers
-                    </span>
-                  </>
-                ) : (
-                  <span className="font-mono text-xs text-slate-400">Regular price</span>
-                )}
+                <span className="text-xl text-slate-400 line-through">
+                  ₹1,499
+                </span>
+                <span className="rounded-full border border-emerald-400/30 bg-emerald-500/10 px-2.5 py-0.5 font-mono text-xs font-medium text-emerald-300">
+                  Save ₹500
+                </span>
               </div>
-
-              <p className="mt-2 font-mono text-xs text-slate-400">
-                {offerState.isLaunchActive
-                  ? `Regular price: ${offerState.india.regularFormatted} after first ${offerState.launchBuyerLimit} buyers`
-                  : `Launch tier (${offerState.india.launchFormatted}) ended`}
-              </p>
 
               <ul className="mt-7 space-y-3 border-t border-white/10 pt-6">
                 {INCLUDED_FEATURES.map((feature) => (
@@ -231,26 +195,22 @@ export function Pricing({ offerState, initialPendingMarket }: PricingProps) {
             </div>
 
             <div className="mt-8">
+              {/* Requirement 4: Scarcity message displayed exactly once immediately above main button */}
+              <div className="mb-2.5 flex items-center justify-center gap-1.5 font-mono text-xs font-semibold text-amber-300">
+                <span className="h-1.5 w-1.5 rounded-full bg-amber-400 animate-pulse" aria-hidden="true" />
+                <span>Only 50 spots available</span>
+              </div>
+
               <button
                 type="button"
-                disabled={loadingMarket !== null}
-                onClick={() => void handleCheckout("india")}
-                className="group flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-violet-600 via-indigo-500 to-cyan-500 px-6 py-3.5 text-sm font-semibold text-white shadow-[0_0_30px_-6px_rgba(139,92,246,0.85)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_0_36px_-4px_rgba(34,211,238,0.65)] disabled:cursor-not-allowed disabled:opacity-70"
+                onClick={handleIndiaCheckout}
+                className="group flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-violet-600 via-indigo-500 to-cyan-500 px-6 py-3.5 text-sm font-semibold text-white shadow-[0_0_30px_-6px_rgba(139,92,246,0.85)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_0_36px_-4px_rgba(34,211,238,0.65)]"
               >
-                {loadingMarket === "india" ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-                    <span>Preparing Razorpay Checkout...</span>
-                  </>
-                ) : (
-                  <>
-                    <span>Get Instant Access</span>
-                    <ArrowRight
-                      className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5"
-                      aria-hidden="true"
-                    />
-                  </>
-                )}
+                <span>Get Instant Access — ₹999</span>
+                <ArrowRight
+                  className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5"
+                  aria-hidden="true"
+                />
               </button>
 
               <p className="mt-3 flex items-center justify-center gap-1.5 text-xs text-slate-400">
@@ -260,7 +220,7 @@ export function Pricing({ offerState, initialPendingMarket }: PricingProps) {
             </div>
           </motion.div>
 
-          {/* International Launch Access */}
+          {/* International Access Card */}
           <motion.div
             initial={{ opacity: 0, y: 18 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -280,35 +240,23 @@ export function Pricing({ offerState, initialPendingMarket }: PricingProps) {
               </div>
 
               <h3 className="mt-5 text-2xl font-bold text-white">
-                {offerState.international.title}
+                International Launch Access
               </h3>
               <p className="mt-1 text-sm text-slate-300">
-                {offerState.international.subtitle}
+                For buyers worldwide (Cards, Apple Pay, PayPal)
               </p>
 
               <div className="mt-6 flex flex-wrap items-baseline gap-3">
                 <span className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
-                  {offerState.international.activeFormatted}
+                  $49
                 </span>
-                {offerState.isLaunchActive ? (
-                  <>
-                    <span className="text-lg text-slate-400 line-through">
-                      {offerState.international.regularFormatted}
-                    </span>
-                    <span className="rounded-full border border-emerald-400/30 bg-emerald-500/10 px-2.5 py-0.5 font-mono text-[11px] text-emerald-300">
-                      Launch price • First {offerState.launchBuyerLimit} buyers
-                    </span>
-                  </>
-                ) : (
-                  <span className="font-mono text-xs text-slate-400">Regular price</span>
-                )}
+                <span className="text-xl text-slate-400 line-through">
+                  $79
+                </span>
+                <span className="rounded-full border border-emerald-400/30 bg-emerald-500/10 px-2.5 py-0.5 font-mono text-xs font-medium text-emerald-300">
+                  Save $30
+                </span>
               </div>
-
-              <p className="mt-2 font-mono text-xs text-slate-400">
-                {offerState.isLaunchActive
-                  ? `Regular price: ${offerState.international.regularFormatted} after first ${offerState.launchBuyerLimit} buyers`
-                  : `Launch tier (${offerState.international.launchFormatted}) ended`}
-              </p>
 
               <ul className="mt-7 space-y-3 border-t border-white/10 pt-6">
                 {INCLUDED_FEATURES.map((feature) => (
@@ -327,7 +275,7 @@ export function Pricing({ offerState, initialPendingMarket }: PricingProps) {
               <button
                 type="button"
                 disabled={loadingMarket !== null}
-                onClick={() => void handleCheckout("international")}
+                onClick={handleInternationalCheckout}
                 className="group flex w-full items-center justify-center gap-2 rounded-full border border-white/20 bg-white/[0.08] px-6 py-3.5 text-sm font-semibold text-white transition-all duration-200 hover:-translate-y-0.5 hover:border-cyan-400/50 hover:bg-white/[0.13] disabled:cursor-not-allowed disabled:opacity-70"
               >
                 {loadingMarket === "international" ? (
@@ -337,7 +285,7 @@ export function Pricing({ offerState, initialPendingMarket }: PricingProps) {
                   </>
                 ) : (
                   <>
-                    <span>Get Instant Access</span>
+                    <span>Get Instant Access — $49</span>
                     <ArrowRight
                       className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5"
                       aria-hidden="true"
@@ -354,6 +302,13 @@ export function Pricing({ offerState, initialPendingMarket }: PricingProps) {
           </motion.div>
         </div>
       </div>
+
+      {/* Razorpay Interactive Checkout Modal */}
+      <CheckoutModal
+        isOpen={isRazorpayModalOpen}
+        onClose={() => setIsRazorpayModalOpen(false)}
+        productTitle="AI Agency Mastery"
+      />
     </section>
   );
 }
