@@ -167,7 +167,7 @@ export async function POST(request: Request) {
     : new Date(parsedTimestamp).toISOString();
 
   const pricingTier: "launch" | "standard" =
-    majorAmount <= 49 ? "launch" : "standard";
+    majorAmount <= 80 ? "launch" : "standard";
 
   const { error } = await admin.from("orders").upsert(
     {

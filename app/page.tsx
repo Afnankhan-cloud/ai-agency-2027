@@ -58,7 +58,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       {
         "@type": "Offer",
         name: "International Launch Access",
-        price: 49,
+        price: 80,
         priceCurrency: "USD",
         availability: "https://schema.org/InStock",
         url: `${siteUrl}/#pricing`

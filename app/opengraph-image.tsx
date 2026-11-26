@@ -108,7 +108,7 @@ export default function OpenGraphImage() {
         >
           <span>Instant ZIP Bundle Delivery</span>
           <span style={{ color: "#A78BFA", fontWeight: 600 }}>
-            India ₹999 • International $49 (First 50 Buyers)
+            India ₹999 • International $80 (First 50 Buyers)
           </span>
         </div>
       </div>

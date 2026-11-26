@@ -52,10 +52,10 @@ export const PRICING_CATALOG = {
     market: "international" as const,
     provider: "gumroad" as const,
     currency: "USD" as const,
-    launchPrice: 49,
-    regularPrice: 79,
-    launchFormatted: "$49",
-    regularFormatted: "$79",
+    launchPrice: 80,
+    regularPrice: 80,
+    launchFormatted: "$80",
+    regularFormatted: "$80",
     title: "International Launch Access",
     subtitle: "For buyers worldwide"
   }

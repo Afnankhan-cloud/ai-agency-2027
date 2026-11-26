@@ -248,14 +248,9 @@ export function Pricing({ initialPendingMarket }: PricingProps) {
 
               <div className="mt-6 flex flex-wrap items-baseline gap-3">
                 <span className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
-                  $49
+                  $80
                 </span>
-                <span className="text-xl text-slate-400 line-through">
-                  $79
-                </span>
-                <span className="rounded-full border border-emerald-400/30 bg-emerald-500/10 px-2.5 py-0.5 font-mono text-xs font-medium text-emerald-300">
-                  Save $30
-                </span>
+                <span className="text-sm font-medium text-slate-400">USD</span>
               </div>
 
               <ul className="mt-7 space-y-3 border-t border-white/10 pt-6">
@@ -285,7 +280,7 @@ export function Pricing({ initialPendingMarket }: PricingProps) {
                   </>
                 ) : (
                   <>
-                    <span>Get Instant Access — $49</span>
+                    <span>Get Instant Access — $80</span>
                     <ArrowRight
                       className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5"
                       aria-hidden="true"

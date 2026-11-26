@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import fs from "fs";
 import path from "path";
 import { verifyDownloadToken } from "@/lib/download-token";
+import { createSupabaseAdminClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
@@ -27,6 +28,22 @@ export async function GET(request: NextRequest) {
       },
       { status: 403 }
     );
+  }
+
+  // 1. If Supabase Storage is configured, try creating a private signed download URL
+  const admin = createSupabaseAdminClient();
+  if (admin) {
+    try {
+      const { data: signedData, error: signedError } = await admin.storage
+        .from("course-assets")
+        .createSignedUrl("AI-Agency-Mastery-Vertex-Digitals.zip", 3600);
+
+      if (!signedError && signedData?.signedUrl) {
+        return NextResponse.redirect(signedData.signedUrl);
+      }
+    } catch (storageErr) {
+      console.warn("Supabase storage signed URL skipped, falling back to local stream:", storageErr);
+    }
   }
 
   // Look for the genuine product ZIP in multiple robust locations
